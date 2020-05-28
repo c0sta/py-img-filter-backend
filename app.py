@@ -7,8 +7,9 @@ import io
 import os
 import pyrebase
 
-app = Flask(__name__)
+app = Flask(__name__) 
 CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 """
 FIREBASE CONFIGURATION
