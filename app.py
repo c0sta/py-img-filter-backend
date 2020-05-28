@@ -1,4 +1,4 @@
-from flask import Flask, flash, request, redirect, url_for, session
+from flask import Flask, flash, request, redirect, url_for, session, jsonify
 from flask_cors import CORS
 from flask import send_file
 import cv2
@@ -83,9 +83,9 @@ def upload_file():
         # clean images folder
         clean_images_folder('./filtered_images/')
         clean_images_folder('./images/')
-        return {"message": "Success"}
+        return jsonify({"message": "Success"})
     else: 
-        return {"message": "Everything cool here :)"}
+        return jsonify({"message": "Everything cool here :)"})
 
 
 """
