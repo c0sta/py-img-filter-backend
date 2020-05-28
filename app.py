@@ -84,6 +84,8 @@ def upload_file():
         clean_images_folder('./filtered_images/')
         clean_images_folder('./images/')
         return {"message": "Success"}
+    else: 
+        return {"message": "Everything cool here :)"}
 
 
 """
