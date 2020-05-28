@@ -1,10 +1,8 @@
 from flask import Flask, flash, request, redirect, url_for, session
-from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from flask import send_file
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 import io
 import os
 import pyrebase
