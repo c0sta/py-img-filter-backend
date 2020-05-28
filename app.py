@@ -51,11 +51,10 @@ def filter_image(extension, name):
     for entry in os.scandir(directory):  # runs through images folder
         if(extension == 'jpg' or extension == 'png' and entry.is_file()):
             img = cv2.imread(entry.path)
-            # filtered_filename = 'filtered-image-'+str(i)+'.'+extension
-            # blurred_img = blur_img(img, 5)
-            gray_img = to_gray_img(img)
-            # cv2.imwrite('./filtered_images/'+filtered_filename, blurred_img)
-            cv2.imwrite('./filtered_images/'+name, gray_img)
+            blurred_img = blur_img(img, 5)
+            # gray_img = to_gray_img(img)
+            cv2.imwrite('./filtered_images/'+name, blurred_img)
+            # cv2.imwrite('./filtered_images/'+name, gray_img)
             storage.child(
                 path_on_cloud+name).put(path_local+name)
             i = i + 1
