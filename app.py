@@ -12,6 +12,9 @@ import pyrebase
 app = Flask(__name__)
 CORS(app)
 
+"""
+FIREBASE CONFIGURATION
+"""
 config = {
     "apiKey": "AIzaSyCTqzXbhyIXVLI8JzQ4SnlLWGs1v5V-8Y4",
     "authDomain": "image-filter-6d9d4.firebaseapp.com",
@@ -29,9 +32,46 @@ path_on_cloud = 'images/'
 path_local = './filtered_images/'
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello, world!'
+"""
+METHODS
+"""
+
+
+def blur_img(img, size):
+    return cv2.GaussianBlur(img, (size, size), 0)
+
+
+def to_gray_img(img):
+    return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
+
+def filter_image(extension, name):
+    i = 0
+    directory = r'./images'  # downloaded images folder
+    for entry in os.scandir(directory):  # runs through images folder
+        if(extension == 'jpg' or extension == 'png' and entry.is_file()):
+            img = cv2.imread(entry.path)
+            # filtered_filename = 'filtered-image-'+str(i)+'.'+extension
+            # blurred_img = blur_img(img, 5)
+            gray_img = to_gray_img(img)
+            # cv2.imwrite('./filtered_images/'+filtered_filename, blurred_img)
+            cv2.imwrite('./filtered_images/'+name, gray_img)
+            storage.child(
+                path_on_cloud+name).put(path_local+name)
+            i = i + 1
+
+
+def clean_images_folder(folder):
+    filelist = [f for f in os.listdir(
+        folder) if f.endswith(".png") or f.endswith(".jpg")]
+
+    for file in filelist:
+        os.remove(os.path.join(folder, file))
+
+
+"""
+ROUTES
+"""
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -42,25 +82,16 @@ def upload_file():
         file.save('./images/'+file.filename)
         # print('is fileName correct? ', file.filename)
         extension = file.filename.split('.')[-1]
-        filter_image(extension)
-
-        return 'its ok being useless brow'
-
-
-def filter_image(extension):
-    i = 0
-    directory = r'./images'  # downloaded images folder
-    for entry in os.scandir(directory):  # runs through images folder
-        if(extension == 'jpg' or extension == 'png' and entry.is_file()):
-            img = cv2.imread(entry.path)
-            filtered_filename = 'filtered-image-'+str(i)+'.'+extension
-            blurred_img = cv2.GaussianBlur(img, (5, 5), 0)
-            cv2.imwrite('./filtered_images/'+filtered_filename, blurred_img)
-            storage.child(
-                path_on_cloud+filtered_filename).put(path_local+filtered_filename)
-            i = i + 1
+        filter_image(extension, file.filename)
+        # clean images folder
+        clean_images_folder('./filtered_images/')
+        clean_images_folder('./images/')
+        return {"message": "Success"}
 
 
+"""
+MAIN
+"""
 if __name__ == '__main__':
     app.run()
 
