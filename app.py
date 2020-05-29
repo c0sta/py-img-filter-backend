@@ -9,7 +9,7 @@ import pyrebase
 
 app = Flask(__name__) 
 CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+# app.config['CORS_HEADERS'] = 'Content-Type'
 
 """
 FIREBASE CONFIGURATION
@@ -76,10 +76,10 @@ def filter_image(extension, name):
 """
 ROUTES
 """
-@app.route('/', methods=['GET'])
+@app.route('/')
 def main_route():
     return jsonify(
-        message = "Rota nao encontrada, use a rota /upload para subir as imagens!"
+        message = "Olá, use a rota /upload para subir as imagens!"
     )
 
 
