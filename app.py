@@ -43,7 +43,7 @@ def clean_images_folder(folder):
 
 
 def blur_img(img, size):
-    return cv2.GaussianBlur(img, (size, size), 0)
+    return cv2.GaussianBlur(img, (size, size), cv2.BORDER_DEFAULT)
 
 
 def to_gray_img(img):
