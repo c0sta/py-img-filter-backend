@@ -34,6 +34,12 @@ path_local = './filtered_images/'
 """
 METHODS
 """
+def clean_images_folder(folder):
+    filelist = [f for f in os.listdir(
+        folder) if f.endswith(".png") or f.endswith(".jpg")]
+
+    for file in filelist:
+        os.remove(os.path.join(folder, file))
 
 
 def blur_img(img, size):
@@ -54,22 +60,27 @@ def filter_image(extension, name):
             # gray_img = to_gray_img(img)
             cv2.imwrite('./filtered_images/'+name, blurred_img)
             # cv2.imwrite('./filtered_images/'+name, gray_img)
+            url = storage.child(path_on_cloud+name).get_url('f166a7c9-2b95-4008-99e7-22cb66444d6a')
+            # store filtered images in the firebase storage
             storage.child(
                 path_on_cloud+name).put(path_local+name)
             i = i + 1
-
-
-def clean_images_folder(folder):
-    filelist = [f for f in os.listdir(
-        folder) if f.endswith(".png") or f.endswith(".jpg")]
-
-    for file in filelist:
-        os.remove(os.path.join(folder, file))
+            # clean images folder
+            clean_images_folder('./filtered_images/')
+            clean_images_folder('./images/')
+            return url
+        else:
+            return "Tipo errado de arquivo"
 
 
 """
 ROUTES
 """
+@app.route('/', methods=['GET'])
+def main_route():
+    return jsonify(
+        message = "Rota nao encontrada, use a rota /upload para subir as imagens!"
+    )
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -80,14 +91,10 @@ def upload_file():
         file.save('./images/'+file.filename)
         # print('is fileName correct? ', file.filename)
         extension = file.filename.split('.')[-1]
-        filter_image(extension, file.filename)
-        # clean images folder
-        clean_images_folder('./filtered_images/')
-        clean_images_folder('./images/')
-        return jsonify({"message": "Success"})
-    else: 
-        return jsonify({"message": "Everything cool here :)"})
-
+        url = filter_image(extension, file.filename)
+        return jsonify(url=url)
+    if request.method == 'GET':
+        return jsonify(message='Rota utilizada para fazer upload de imagens')
 
 """
 MAIN
