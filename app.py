@@ -50,24 +50,25 @@ def to_gray_img(img):
     return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
 
-def filter_image(extension, name):
+def filter_image(extension, name, filter_type):
     i = 0
     directory = r'./images'  # downloaded images folder
     for entry in os.scandir(directory):  # runs through images folder
         if(extension == 'jpg' or extension == 'png' and entry.is_file()):
             img = cv2.imread(entry.path)
-            blurred_img = blur_img(img, 5)
-            # gray_img = to_gray_img(img)
-            cv2.imwrite('./filtered_images/'+name, blurred_img)
-            # cv2.imwrite('./filtered_images/'+name, gray_img)
+            
+            if(filter_type == 'gray'):
+                gray_img = to_gray_img(img)
+                cv2.imwrite('./filtered_images/'+name, gray_img)
+            elif(filter_type == 'blur'):
+                blurred_img = blur_img(img, 5)
+                cv2.imwrite('./filtered_images/'+name, blurred_img)
+                
             url = storage.child(path_on_cloud+name).get_url('f166a7c9-2b95-4008-99e7-22cb66444d6a')
             # store filtered images in the firebase storage
             storage.child(
                 path_on_cloud+name).put(path_local+name)
             i = i + 1
-            # clean images folder
-            clean_images_folder('./filtered_images/')
-            clean_images_folder('./images/')
             return url
         else:
             return "Tipo errado de arquivo"
@@ -83,15 +84,18 @@ def main_route():
     )
 
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
+@app.route('/upload/<filter_type>', methods=['GET', 'POST'])
+def upload_file(filter_type):
     print('###### inside the upload_file! ######')
     if request.method == 'POST':
         file = request.files['file']
         file.save('./images/'+file.filename)
         # print('is fileName correct? ', file.filename)
         extension = file.filename.split('.')[-1]
-        url = filter_image(extension, file.filename)
+        url = filter_image(extension, file.filename, filter_type)
+        # clean images folder
+        clean_images_folder('./filtered_images/')
+        clean_images_folder('./images/')
         return jsonify(url=url)
     if request.method == 'GET':
         return jsonify(message='Rota utilizada para fazer upload de imagens')
