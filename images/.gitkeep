@@ -1,0 +1,4 @@
+# ignore all imgs
+images/*
+# don't ignore gitkeep
+!.gitkeep
