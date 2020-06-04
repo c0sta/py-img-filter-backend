@@ -80,7 +80,7 @@ ROUTES
 @app.route('/')
 def main_route():
     return jsonify(
-        message = "Olá, use a rota /upload para subir as imagens!"
+        message = "Use a rota /upload para subir as imagens!"
     )
 
 
